@@ -5,6 +5,8 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { User } from './user/entities/user.entity';
+import { UserModule } from './user/user.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -16,7 +18,7 @@ const typeOrmModuleOptions = {
     username: configService.get('DB_USERNAME'),
     password: configService.get('DB_PASSWORD'),
     database: configService.get('DB_NAME'),
-    entities: [Post],
+    entities: [User],
     synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),
@@ -37,7 +39,7 @@ const typeOrmModuleOptions = {
       }),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
-    PostModule,
+    UserModule
   ],
   controllers: [AppController],
   providers: [AppService],
