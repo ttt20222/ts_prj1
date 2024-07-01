@@ -51,6 +51,7 @@ export class UserService {
     
     //포인트테이블 생성
     await this.pointRepository.save({
+      user_id: newUser.userId,
       point: initialPoint,
     });
 
@@ -88,5 +89,17 @@ export class UserService {
   //이메일로 찾기
   async findByEmail(email: string) {
     return await this.userRepository.findOneBy({ email });
+  }
+
+  //내 정보 조회하기
+  async getUser(user: User){
+    const getUser = await this.userRepository.query(
+      `select a.email as email, a.name as name, a.nickname as nickname, b.point as point
+      from users a join points b
+      on a.user_id = b.user_id
+      where a.user_id = ${user.userId};`
+    );
+
+    return getUser;
   }
 }
