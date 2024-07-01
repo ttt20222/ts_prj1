@@ -1,7 +1,8 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import {
-  Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn
+  Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn
 } from 'typeorm';
+import { Point } from './point.entity';
 
 @Entity({
   name: 'users',
@@ -11,18 +12,22 @@ export class User {
   userId: number;
 
   @IsEmail()
+  @IsNotEmpty()
   @Column('varchar', { name: 'email', length: 50, unique: true, nullable: false })
   email: string;
 
   @IsString()
+  @IsNotEmpty()
   @Column('varchar', { name: 'password', length: 10, select: false, nullable: false })
   password: string;
 
   @IsString()
+  @IsNotEmpty()
   @Column('varchar', { name: 'name', length: 10, nullable: false })
   name: string;
 
   @IsString()
+  @IsNotEmpty()
   @Column('varchar', { name: 'nickname', length: 10, nullable: false })
   nickname: string;
 
@@ -34,4 +39,7 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToOne(() => Point, (point) => point.user)
+  point: Point;
 }
