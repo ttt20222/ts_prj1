@@ -10,6 +10,13 @@ import { User } from './user/entities/user.entity';
 import { Point } from './user/entities/point.entity';
 import { PointLog } from './user/entities/point_log.entity';
 import { AuthModule } from './auth/auth.module';
+import { ShowModule } from './show/show.module';
+import { Show } from './show/entities/show.entity';
+import { Hall } from './show/entities/hall.entity';
+import { Seat } from './show/entities/seat.entity';
+import { Image } from './show/entities/image.entity';
+import { showTimeInfo } from './show/entities/showTimeInfo.entity';
+import { showSeatMapping } from './show/entities/showSeatMapping.entity';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -21,7 +28,7 @@ const typeOrmModuleOptions = {
     username: configService.get('DB_USERNAME'),
     password: configService.get('DB_PASSWORD'),
     database: configService.get('DB_NAME'),
-    entities: [User, Point, PointLog],
+    entities: [User, Point, PointLog, Show, Image, Hall, Seat, showTimeInfo, showSeatMapping],
     synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),
@@ -44,7 +51,8 @@ const typeOrmModuleOptions = {
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     UserModule,
-    AuthModule
+    AuthModule,
+    ShowModule
   ],
   controllers: [],
   providers: [],
