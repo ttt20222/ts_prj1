@@ -18,7 +18,7 @@ export class User {
 
   @IsString()
   @IsNotEmpty()
-  @Column('varchar', { name: 'password', length: 10, select: false, nullable: false })
+  @Column('varchar', { name: 'password', select: false, nullable: false })
   password: string;
 
   @IsString()
