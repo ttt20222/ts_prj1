@@ -34,9 +34,6 @@ export class Hall {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Show, (show) => show.hall)
-  show: Show[];
-
   @OneToMany(() => Seat, (seat) => seat.hall)
   seat: Seat[];
 }

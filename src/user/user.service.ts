@@ -51,7 +51,7 @@ export class UserService {
     
     //포인트테이블 생성
     await this.pointRepository.save({
-      user_id: newUser.userId,
+      userId: newUser.userId,
       point: initialPoint,
     });
 

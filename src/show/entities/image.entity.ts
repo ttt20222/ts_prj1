@@ -15,6 +15,9 @@ export class Image {
   @JoinColumn({ name: 'show_id' })
   show: Show;
 
+  @Column({ type: 'int', name: 'show_id' })
+  showId: number;
+
   @IsString()
   @Column('varchar', { name: 'image_url', nullable: false })
   imageUrl: string;

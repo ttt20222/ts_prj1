@@ -21,9 +21,10 @@ export class Show {
   @Column('varchar', { name: 'show_name', nullable: false })
   showName: string;
 
-  @ManyToOne(() => Hall, (hall) => hall.show)
-  @JoinColumn({ name: 'hall_name' })
-  hall: Hall;
+  @IsNotEmpty()
+  @IsString()
+  @Column('varchar', { name: 'hall_name', nullable: false })
+  hallName: string;
 
   @IsEnum(Category)
   @IsNotEmpty()
@@ -31,11 +32,11 @@ export class Show {
   category: Category;
 
   @IsNotEmpty()
-  @Column('datetime', { name: 'start_date', nullable: false })
+  @Column('date', { name: 'start_date', nullable: false })
   startDate: Date;
 
   @IsNotEmpty()
-  @Column('datetime', { name: 'end_date', nullable: false })
+  @Column('date', { name: 'end_date', nullable: false })
   endDate: Date;
 
   @IsNotEmpty()
@@ -51,7 +52,7 @@ export class Show {
   @IsNotEmpty()
   @IsArray()
   @Column('json', { name: 'seat_info', nullable: false })
-  seatInfo: string[];
+  seatInfo: string;
 
   @IsEnum(Status)
   @IsNotEmpty()

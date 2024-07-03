@@ -15,6 +15,9 @@ export class showTimeInfo {
   @JoinColumn({ name: 'show_id' })
   show: Show;
 
+  @Column({ type: 'int', name: 'show_id' })
+  showId: number;
+
   @Column('datetime', { name: 'show_time', nullable: false })
   showTime: Date;
 

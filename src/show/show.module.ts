@@ -11,6 +11,7 @@ import { showTimeInfo } from './entities/showTimeInfo.entity';
 import { showSeatMapping } from './entities/showSeatMapping.entity';
 import { ShowService } from './show.service';
 import { ShowController } from './show.controller';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ShowController } from './show.controller';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([Show, Image, Hall, Seat, showTimeInfo, showSeatMapping]),
+    UserModule,
   ],
   providers: [ShowService],
   controllers: [ShowController],

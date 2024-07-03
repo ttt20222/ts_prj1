@@ -16,6 +16,9 @@ export class Seat {
   @JoinColumn({ name: 'hall_id' })
   hall: Hall;
 
+  @Column({ type: 'int', name: 'hall_id' })
+  hallId: number;
+
   @IsNotEmpty()
   @IsString()
   @Column('varchar', { name: 'seat_grade', length : 10, nullable: false })
@@ -38,9 +41,6 @@ export class Seat {
 
   @CreateDateColumn()
   createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @OneToMany(() => showSeatMapping, (showseatmapping) => showseatmapping.seat)
   showseatmapping: showSeatMapping[];

@@ -16,6 +16,9 @@ export class Point {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+  @Column({ type: 'int', name: 'user_id' })
+  userId: number;
+
   @Column('int', { name: 'point', nullable: false })
   point: number;
 
