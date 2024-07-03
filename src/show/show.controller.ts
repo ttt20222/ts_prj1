@@ -28,8 +28,8 @@ export class ShowController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
-  async findSeat(@Param('id') id: string, @Query('showtime') showtime: string) {
+  @Get(':id/time')
+  async findSeat(@Param('id') id: string, @Query('showtime') showtime: Date) {
     return await this.showService.findSeat(+id, showtime);
   }
 

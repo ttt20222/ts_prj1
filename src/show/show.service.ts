@@ -156,7 +156,34 @@ export class ShowService {
   }
 
   //공연 좌석 예매 현황 확인(예매 가능한 좌석보기)
-  async findSeat(id: number, showtime: string) {
+  async findSeat(id: number, showtime: Date) {
 
+    const time = await this.showTimeInfoRepository.findOne({
+      where: {showTime: showtime},
+    })
+
+    const findShow = await this.showSeatMappingRepository.find({
+      where: {showId: id, showTimeId: time.showTimeId},
+      relations: ['seat'],
+      select: {
+        seat: {
+          seatGrade: true,
+          seatFloor: true,
+          seatRow: true,
+          seatNumber: true,
+        },
+        isReserved : true,
+      }
+    });
+
+    const resShow = findShow.map((show) => ({
+      seat: show.seat.seatGrade 
+            + ' ' + show.seat.seatFloor 
+            + ' ' + show.seat.seatRow 
+            + ' ' + show.seat.seatNumber,
+      isReserved: show.isReserved ? '예매 완료' : '예매 가능',
+    }));
+
+    return resShow;
   }
 }
