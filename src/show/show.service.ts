@@ -4,7 +4,7 @@ import { CreateShowDto } from './dto/create-show.dto';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadRequestException, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
 
 import { Show } from './entities/show.entity';
 import { Hall } from './entities/hall.entity';
@@ -102,6 +102,12 @@ export class ShowService {
       },
     });
 
+    if(!findShow) {
+      throw new NotFoundException(
+        '해당하는 공연이 없습니다.'
+      );
+    }
+
     return findShow;
   }
 
@@ -112,7 +118,13 @@ export class ShowService {
       `select show_name, hall_name, category, start_date , end_date ,runtime , content , seat_info , status
       from shows
       where show_name like '%${searchShowDto.showName}%';`
-    )
+    );
+
+    if(searchShow.length === 0) {
+      throw new NotFoundException(
+        '해당하는 공연이 없습니다.'
+      );
+    }
 
     return searchShow;
   }
