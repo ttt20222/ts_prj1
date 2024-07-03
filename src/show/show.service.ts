@@ -65,7 +65,7 @@ export class ShowService {
       showId: newShow.showId,
       imageUrl : createShowDto.imageUrl,
     })
-    
+
     //좌석 정보 생성
     for (const seat of createShowDto.seatDetailInfo) {
       await this.seatRepository.save({
@@ -88,11 +88,18 @@ export class ShowService {
     return newShow;
   }
 
-  // findAll() {
-  //   return `This action returns all show`;
-  // }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} show`;
-  // }
+  async findOne(id: number) {
+
+    const findShow = await this.showRepository.findOne({
+      where: {showId: id},
+      select: {
+        createdAt: false,
+        updatedAt: false,
+      },
+    });
+
+    return findShow;
+  }
+
 }

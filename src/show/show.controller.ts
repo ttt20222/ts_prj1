@@ -16,13 +16,13 @@ export class ShowController {
     return await this.showService.createShow(user, createShowDto);
   }
 
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.showService.findOne(+id);
+  }
+
   // @Get()
   // findAll() {
   //   return this.showService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.showService.findOne(+id);
   // }
 }
