@@ -12,6 +12,7 @@ import { showTimeInfo } from './entities/showTimeInfo.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Seat } from './entities/seat.entity';
 import { Image } from './entities/image.entity';
+import { SearchShowDto } from './dto/search-show.dto';
 
 @Injectable()
 export class ShowService {
@@ -29,6 +30,8 @@ export class ShowService {
     private readonly jwtService: JwtService,
   ) {}
 
+  //공연 생성
+  //공연 생성 시, 좌석정보, 회차정보 함꼐 생성
   async createShow(user: User, createShowDto: CreateShowDto) {
 
     if(user.isAdmin !== true){
@@ -88,7 +91,7 @@ export class ShowService {
     return newShow;
   }
 
-
+//공연 상세조회
   async findOne(id: number) {
 
     const findShow = await this.showRepository.findOne({
@@ -102,4 +105,15 @@ export class ShowService {
     return findShow;
   }
 
+  //공연명 검색
+  async searchOne(searchShowDto: SearchShowDto) {
+
+    const searchShow = await this.showRepository.query(
+      `select show_name, hall_name, category, start_date , end_date ,runtime , content , seat_info , status
+      from shows
+      where show_name like '%${searchShowDto.showName}%';`
+    )
+
+    return searchShow;
+  }
 }

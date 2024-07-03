@@ -5,6 +5,7 @@ import { ShowService } from './show.service';
 import { CreateShowDto } from './dto/create-show.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/user/entities/user.entity';
+import { SearchShowDto } from './dto/search-show.dto';
 
 @Controller('show')
 export class ShowController {
@@ -16,9 +17,14 @@ export class ShowController {
     return await this.showService.createShow(user, createShowDto);
   }
 
+  @Get('search')
+  async searchOne(@Body() searchShowDto: SearchShowDto) {
+    return await this.showService.searchOne(searchShowDto);
+  }
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.showService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.showService.findOne(+id);
   }
 
   // @Get()
