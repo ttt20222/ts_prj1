@@ -1,34 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
 import { ReserveService } from './reserve.service';
 import { CreateReserveDto } from './dto/create-reserve.dto';
 import { UpdateReserveDto } from './dto/update-reserve.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/user/entities/user.entity';
+import { UserInfo } from 'src/utils/userInfo.decorator';
 
 @Controller('reserve')
 export class ReserveController {
   constructor(private readonly reserveService: ReserveService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
-  create(@Body() createReserveDto: CreateReserveDto) {
-    return this.reserveService.create(createReserveDto);
+  reserveShow(@UserInfo() user: User, @Body() createReserveDto: CreateReserveDto) {
+    return this.reserveService.reserveShow(user, createReserveDto);
   }
 
-  @Get()
-  findAll() {
-    return this.reserveService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.reserveService.findAll();
+  // }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reserveService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReserveDto: UpdateReserveDto) {
-    return this.reserveService.update(+id, updateReserveDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reserveService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.reserveService.remove(+id);
+  // }
 }

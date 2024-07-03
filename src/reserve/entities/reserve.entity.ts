@@ -38,23 +38,8 @@ export class Reserve {
 
   @IsNotEmpty()
   @IsString()
-  @Column('varchar', { name: 'seat_grade', length : 10, nullable: false })
-  seatGrade: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @Column('varchar', { name: 'seat_floor', length : 10, nullable: false })
-  seatFloor: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @Column('varchar', { name: 'seat_row', length : 10, nullable: false })
-  seatRow: string;
-
-  @IsNotEmpty()
-  @IsInt()
-  @Column('int', { name: 'seat_number', nullable: false })
-  seatNumber: number;
+  @Column('varchar', { name: 'seat_grade', nullable: false })
+  seatInfo: string;
 
   @IsNotEmpty()
   @IsInt()
@@ -63,7 +48,7 @@ export class Reserve {
 
   @IsNotEmpty()
   @IsString()
-  @Column('enum', { enum: Status, name: 'status', nullable: false })
+  @Column('enum', { enum: Status, name: 'status', default : '예매완료', nullable: false })
   status: Status;
 
   @CreateDateColumn()

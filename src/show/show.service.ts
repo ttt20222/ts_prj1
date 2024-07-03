@@ -76,6 +76,7 @@ export class ShowService {
     //좌석 정보 생성
     for (const seat of createShowDto.seatDetailInfo) {
       await this.seatRepository.save({
+        showId: newShow.showId,
         hallId: existHall.hallId,
         seatGrade: seat.seatGrade,
         seatFloor: seat.seatFloor,

@@ -4,6 +4,7 @@ import {
 } from 'typeorm';
 import { Hall } from './hall.entity';
 import { showSeatMapping } from './showSeatMapping.entity';
+import { Show } from './show.entity';
 
 @Entity({
   name: 'seats',
@@ -18,6 +19,13 @@ export class Seat {
 
   @Column({ type: 'int', name: 'hall_id' })
   hallId: number;
+
+  @ManyToOne(() => Show, (show) => show.seat)
+  @JoinColumn({ name: 'show_id' })
+  show: Show;
+
+  @Column({ type: 'int', name: 'show_id' })
+  showId: number;
 
   @IsNotEmpty()
   @IsString()

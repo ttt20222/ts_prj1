@@ -10,6 +10,9 @@ import { ReserveService } from './reserve.service';
 import { Reserve } from './entities/reserve.entity';
 import { User } from 'src/user/entities/user.entity';
 import { ShowModule } from 'src/show/show.module';
+import { showSeatMapping } from 'src/show/entities/showSeatMapping.entity';
+import { Seat } from 'src/show/entities/seat.entity';
+import { showTimeInfo } from 'src/show/entities/showTimeInfo.entity';
 
 @Module({
   imports: [
@@ -19,7 +22,7 @@ import { ShowModule } from 'src/show/show.module';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Reserve, User, Show]),
+    TypeOrmModule.forFeature([Reserve, User, Show, showSeatMapping, Seat, showTimeInfo]),
     UserModule,
     ShowModule,
   ],
