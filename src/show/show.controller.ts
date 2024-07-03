@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Query } from '@nestjs/common';
 import { UserInfo } from 'src/utils/userInfo.decorator';
 
 import { ShowService } from './show.service';
@@ -25,6 +25,12 @@ export class ShowController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.showService.findOne(+id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':id')
+  async findSeat(@Param('id') id: string, @Query('showtime') showtime: string) {
+    return await this.showService.findSeat(+id, showtime);
   }
 
   // @Get()

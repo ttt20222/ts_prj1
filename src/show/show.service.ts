@@ -13,6 +13,8 @@ import { User } from 'src/user/entities/user.entity';
 import { Seat } from './entities/seat.entity';
 import { Image } from './entities/image.entity';
 import { SearchShowDto } from './dto/search-show.dto';
+import { FindSeatDto } from './dto/find-seat.dto';
+import { showSeatMapping } from './entities/showSeatMapping.entity';
 
 @Injectable()
 export class ShowService {
@@ -27,11 +29,13 @@ export class ShowService {
     private seatRepository: Repository<Seat>,
     @InjectRepository(Image)
     private imageRepository: Repository<Image>,
+    @InjectRepository(showSeatMapping)
+    private showSeatMappingRepository: Repository<showSeatMapping>,
     private readonly jwtService: JwtService,
   ) {}
 
   //공연 생성
-  //공연 생성 시, 좌석정보, 회차정보 함꼐 생성
+  //공연 생성 시, 좌석정보, 회차정보, 매핑정보 함께 생성
   async createShow(user: User, createShowDto: CreateShowDto) {
 
     if(user.isAdmin !== true){
@@ -83,9 +87,31 @@ export class ShowService {
     //공연 회차 정보 생성
     for (const time of createShowDto.showTime) {
       await this.showTimeInfoRepository.save({
-        showId: newShow.showId,
-        showTime: time,
-      });
+          showId: newShow.showId,
+          showTime: time,
+        });
+    }
+
+    //좌석 매핑 정보 생성
+    const showtimes = await this.showTimeInfoRepository.find({
+      where : {showId: newShow.showId},
+      select : ['showTimeId'],
+    });
+
+    const seats = await this.seatRepository.find({
+      where: {hallId: existHall.hallId},
+      select: ['seatId'],
+    });
+
+    for ( const time of showtimes) {
+      for ( const seat of seats) {
+        await this.showSeatMappingRepository.save({
+          showId: newShow.showId,
+          showTimeId: time.showTimeId,
+          seatId: seat.seatId,
+          isReserved: false,
+        });
+      }
     }
 
     return newShow;
@@ -127,5 +153,10 @@ export class ShowService {
     }
 
     return searchShow;
+  }
+
+  //공연 좌석 예매 현황 확인(예매 가능한 좌석보기)
+  async findSeat(id: number, showtime: string) {
+
   }
 }
