@@ -164,8 +164,11 @@ export class ShowService {
 
     const findShow = await this.showSeatMappingRepository.find({
       where: {showId: id, showTimeId: time.showTimeId},
-      relations: ['seat'],
+      relations: ['show','seat'],
       select: {
+        show: {
+          showName: true,
+        },
         seat: {
           seatGrade: true,
           seatFloor: true,
@@ -176,12 +179,13 @@ export class ShowService {
       }
     });
 
-    const resShow = findShow.map((show) => ({
-      seat: show.seat.seatGrade 
-            + ' ' + show.seat.seatFloor 
-            + ' ' + show.seat.seatRow 
-            + ' ' + show.seat.seatNumber,
-      isReserved: show.isReserved ? '예매 완료' : '예매 가능',
+    const resShow = findShow.map((item) => ({
+      showName: item.show.showName,
+      seat: item.seat.seatGrade 
+            + ' ' + item.seat.seatFloor 
+            + ' ' + item.seat.seatRow 
+            + ' ' + item.seat.seatNumber,
+      isReserved: item.isReserved ? '에매 불가능' : '예매 가능',
     }));
 
     return resShow;
