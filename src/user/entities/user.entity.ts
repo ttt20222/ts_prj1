@@ -1,8 +1,9 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import {
-  Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn
+  Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn
 } from 'typeorm';
 import { Point } from './point.entity';
+import { Reserve } from 'src/reserve/entities/reserve.entity';
 
 @Entity({
   name: 'users',
@@ -42,4 +43,7 @@ export class User {
 
   @OneToOne(() => Point, (point) => point.user)
   point: Point;
+
+  @OneToMany(() => Reserve, (reserve) => reserve.user)
+  reserve: Reserve[];
 }

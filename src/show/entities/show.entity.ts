@@ -8,6 +8,7 @@ import { Image } from './image.entity';
 import { Hall } from './hall.entity';
 import { showTimeInfo } from './showTimeInfo.entity';
 import { showSeatMapping } from './showSeatMapping.entity';
+import { Reserve } from 'src/reserve/entities/reserve.entity';
 
 @Entity({
   name: 'shows',
@@ -73,4 +74,7 @@ export class Show {
 
   @OneToMany(() => showSeatMapping, (showseatmapping) => showseatmapping.show)
   showseatmapping: showSeatMapping[];
+
+  @OneToMany(() => Reserve, (reserve) => reserve.show)
+  reserve: Reserve[];
 }

@@ -17,6 +17,8 @@ import { Seat } from './show/entities/seat.entity';
 import { Image } from './show/entities/image.entity';
 import { showTimeInfo } from './show/entities/showTimeInfo.entity';
 import { showSeatMapping } from './show/entities/showSeatMapping.entity';
+import { ReserveModule } from './reserve/reserve.module';
+import { Reserve } from './reserve/entities/reserve.entity';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -28,7 +30,7 @@ const typeOrmModuleOptions = {
     username: configService.get('DB_USERNAME'),
     password: configService.get('DB_PASSWORD'),
     database: configService.get('DB_NAME'),
-    entities: [User, Point, PointLog, Show, Image, Hall, Seat, showTimeInfo, showSeatMapping],
+    entities: [User, Point, PointLog, Show, Image, Hall, Seat, showTimeInfo, showSeatMapping, Reserve],
     synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),
@@ -52,7 +54,8 @@ const typeOrmModuleOptions = {
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     UserModule,
     AuthModule,
-    ShowModule
+    ShowModule,
+    ReserveModule
   ],
   controllers: [],
   providers: [],
