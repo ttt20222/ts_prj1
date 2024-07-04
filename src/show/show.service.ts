@@ -15,6 +15,7 @@ import { Image } from './entities/image.entity';
 import { SearchShowDto } from './dto/search-show.dto';
 import { showSeatMapping } from './entities/showSeatMapping.entity';
 import moment from 'moment';
+import { FindShowDto } from './dto/find-show.dto';
 
 @Injectable()
 export class ShowService {
@@ -206,5 +207,23 @@ export class ShowService {
     }));
 
     return resShow;
+  }
+
+  //공연검색 (전체, 카테고리별)
+  async findAll(findShowDto: FindShowDto) {
+    if(findShowDto) {
+      const shows = await this.showRepository.find({
+        where: {category: findShowDto.category},
+      });
+
+      return shows;
+
+    }else{
+      const allShows = await this.showRepository.find({
+        order: {createdAt: 'DESC'}
+      });
+
+      return allShows;
+    }
   }
 }

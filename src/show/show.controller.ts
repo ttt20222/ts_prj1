@@ -6,6 +6,7 @@ import { CreateShowDto } from './dto/create-show.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/user/entities/user.entity';
 import { SearchShowDto } from './dto/search-show.dto';
+import { FindShowDto } from './dto/find-show.dto';
 
 @Controller('show')
 export class ShowController {
@@ -15,6 +16,11 @@ export class ShowController {
   @Post()
   async createShow(@UserInfo() user: User, @Body() createShowDto: CreateShowDto){
     return await this.showService.createShow(user, createShowDto);
+  }
+
+  @Get()
+  async findAll(@Query('category') findShowDto: FindShowDto) {
+    return this.showService.findAll(findShowDto);
   }
 
   @Get('search')
@@ -32,9 +38,4 @@ export class ShowController {
   async findSeat(@Param('id') id: string, @Query('showtime') showtime: Date) {
     return await this.showService.findSeat(+id, showtime);
   }
-
-  // @Get()
-  // findAll() {
-  //   return this.showService.findAll();
-  // }
 }
