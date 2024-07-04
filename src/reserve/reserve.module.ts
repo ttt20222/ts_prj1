@@ -13,6 +13,8 @@ import { ShowModule } from 'src/show/show.module';
 import { showSeatMapping } from 'src/show/entities/showSeatMapping.entity';
 import { Seat } from 'src/show/entities/seat.entity';
 import { showTimeInfo } from 'src/show/entities/showTimeInfo.entity';
+import { Point } from 'src/user/entities/point.entity';
+import { PointLog } from 'src/user/entities/point_log.entity';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { showTimeInfo } from 'src/show/entities/showTimeInfo.entity';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Reserve, User, Show, showSeatMapping, Seat, showTimeInfo]),
+    TypeOrmModule.forFeature([Reserve, User, Show, showSeatMapping, Seat, showTimeInfo, Point, PointLog]),
     UserModule,
     ShowModule,
   ],

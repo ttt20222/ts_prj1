@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
 import { CreateReserveDto } from './dto/create-reserve.dto';
 import { UpdateReserveDto } from './dto/update-reserve.dto';
 import { User } from 'src/user/entities/user.entity';
@@ -10,6 +11,8 @@ import { Show } from 'src/show/entities/show.entity';
 import { showSeatMapping } from 'src/show/entities/showSeatMapping.entity';
 import { Seat } from 'src/show/entities/seat.entity';
 import { showTimeInfo } from 'src/show/entities/showTimeInfo.entity';
+import { Point } from 'src/user/entities/point.entity';
+import { PointLog } from 'src/user/entities/point_log.entity';
 
 @Injectable()
 export class ReserveService {
@@ -24,6 +27,10 @@ export class ReserveService {
     private seatRepository: Repository<Seat>,
     @InjectRepository(showTimeInfo)
     private showTimeInfoRepository: Repository<showTimeInfo>,
+    @InjectRepository(Point)
+    private pointRepository: Repository<Point>,
+    @InjectRepository(PointLog)
+    private pointLogRepository: Repository<PointLog>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -60,8 +67,6 @@ export class ReserveService {
       where: {showName: createReserveDto.showName},
     });
 
-    const seatGrade = createReserveDto.seatInfo.split('')[0];
-
     const findSeatId = await this.seatRepository.findOne({
       where: {showId: show.showId}
     })
@@ -70,11 +75,36 @@ export class ReserveService {
       where: {showTime: createReserveDto.showTime}
     })
 
-    const ticketNumber = await this.getUniqueTicketNumber();
+    //예매 가능 여부 확인
+    const checkReserve = await this.showSeatMappingRepository.findOne({
+      where: {
+        showId: show.showId,
+        showTimeId: findShowTimeId.showTimeId,
+        seatId: findSeatId.seatId,
+      },
+    });
+    if(checkReserve.isReserved === true){
+      throw new BadRequestException(
+        '이미 선택된 좌석입니다.'
+      )
+    };
 
-    const gradePrice = JSON.parse(show.seatInfo).find((info:any) => info.grade === seatGrade);
+    //예매 가능 포인트 확인
+    const seatGrade = createReserveDto.seatInfo.split(' ')[0];
+
+    const gradePrice = JSON.parse(JSON.stringify(show.seatInfo)).find((info:any) => info.grade === seatGrade.toLowerCase());
+
+    const userInfo = await this.pointRepository.findOne({
+      where: {userId: user.userId},
+    });
+    if(userInfo.point < gradePrice.price) {
+      throw new BadRequestException(
+        '잔여 포인트가 부족합니다.'
+      )
+    };
 
     //예매 정보 생성
+    const ticketNumber = await this.getUniqueTicketNumber();
     const reserveShow = await this.reserveRepository.save({
       userId: user.userId,
       ticketNumber: ticketNumber,
@@ -94,6 +124,19 @@ export class ReserveService {
       {
         isReserved: true,
       }
+    );
+
+    //포인트 차감
+    await this.pointLogRepository.create(
+      {
+        userId: user.userId,
+        point: -reserveShow.price,
+      }
+    );
+
+    await this.pointRepository.update(
+      {userId: user.userId},
+      {point: userInfo.point - reserveShow.price}
     );
 
     return reserveShow;
