@@ -13,6 +13,7 @@ import { Seat } from 'src/show/entities/seat.entity';
 import { showTimeInfo } from 'src/show/entities/showTimeInfo.entity';
 import { Point } from 'src/user/entities/point.entity';
 import { PointLog } from 'src/user/entities/point_log.entity';
+import { Status } from './types/reserve.type';
 
 @Injectable()
 export class ReserveService {
@@ -68,17 +69,27 @@ export class ReserveService {
       where: {showName: createReserveDto.showName},
     });
 
+    const seatGrade = createReserveDto.seatInfo.split(' ')[0];
+    const seatFloor = createReserveDto.seatInfo.split(' ')[1];
+    const seatRow = createReserveDto.seatInfo.split(' ')[2];
+    const seatNumber = createReserveDto.seatInfo.split(' ')[3];
+
     const findSeatId = await this.seatRepository.findOne({
-      where: {showId: show.showId}
-    })
+      where: {showId: show.showId,
+              seatGrade: seatGrade,
+              seatFloor: seatFloor,
+              seatRow: seatRow,
+              seatNumber: +seatNumber,
+      },
+    });
 
     const findShowTimeId = await this.showTimeInfoRepository.findOne({
-      where: {showTime: createReserveDto.showTime}
+      where: {showTime: createReserveDto.showTime,
+              showId: show.showId,
+      }
     })
 
     //예매 가능 포인트 확인
-    const seatGrade = createReserveDto.seatInfo.split(' ')[0];
-
     const gradePrice = JSON.parse(JSON.stringify(show.seatInfo)).find((info:any) => info.grade === seatGrade.toLowerCase());
 
     const userInfo = await this.pointRepository.findOne({
@@ -160,6 +171,7 @@ export class ReserveService {
       relations: ['show'],
       where: {userId: user.userId},
       select: {
+        reserveId: true,
         ticketNumber: true,
         show: {
           showName : true,
@@ -174,10 +186,87 @@ export class ReserveService {
       order: {createdAt: 'DESC'}
     });
 
+    if(!userReserve || userReserve.length === 0) {
+      throw new BadRequestException(
+        '예매 내역이 없습니다.'
+      );
+    };
+
     return userReserve;
   }
 
-  // update(id: number, updateReserveDto: UpdateReserveDto) {
-  //   return `This action updates a #${id} reserve`;
-  // }
+  //예매 취소
+  async reserveDelete(user: User, id: number) {
+    
+    const reserve = await this.reserveRepository.findOne({
+      where: {reserveId: id},
+    });
+
+    if(!reserve) {
+      throw new BadRequestException(
+        '예매 내역이 없습니다.'
+      );
+    };
+
+    //공연시작 3시간 전까지만 취소 가능
+    const now = new Date();
+    const timeCal = (reserve.showTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+    if( timeCal < 3) {
+      throw new BadRequestException(
+        '공연 시작 3시간 전까지만 취소 가능합니다.'
+      )
+    };
+
+    //좌석 예매불가능 -> 가능으로 변경
+    const seatGrade = reserve.seatInfo.split(' ')[0];
+    const seatFloor = reserve.seatInfo.split(' ')[1];
+    const seatRow = reserve.seatInfo.split(' ')[2];
+    const seatNumber = reserve.seatInfo.split(' ')[3];
+
+    const findSeatId = await this.seatRepository.findOne({
+      where: {showId: reserve.showId,
+              seatGrade: seatGrade,
+              seatFloor: seatFloor,
+              seatRow: seatRow,
+              seatNumber: +seatNumber,
+      },
+    });
+
+    const findShowTimeId = await this.showTimeInfoRepository.findOne({
+      where: {showTime: reserve.showTime,
+              showId: reserve.showId,
+      }
+    })
+
+    await this.showSeatMappingRepository.update(
+      {showId: reserve.showId,
+       showTimeId: findShowTimeId.showTimeId,
+       seatId: findSeatId.seatId,
+      },
+      {isReserved: false},
+    );
+
+    //예매내역 예매완료 -> 예매취소 변경
+    const reserveCancle = await this.reserveRepository.update(
+      {reserveId: id},
+      {status: Status.예매취소}
+    )
+
+    //포인트 환불
+    await this.pointLogRepository.save({
+      userId: user.userId,
+      point: reserve.price,
+    });
+
+    const userInfo = await this.pointRepository.findOne({
+      where: {userId: user.userId},
+    });
+
+    await this.pointRepository.update(
+      {userId: user.userId},
+      {point: userInfo.point + reserve.price},
+    );
+
+    return reserveCancle;
+  }
 }
