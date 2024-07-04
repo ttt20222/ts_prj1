@@ -1,11 +1,9 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Delete } from '@nestjs/common';
 import { ReserveService } from './reserve.service';
 import { CreateReserveDto } from './dto/create-reserve.dto';
-import { UpdateReserveDto } from './dto/update-reserve.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/user/entities/user.entity';
 import { UserInfo } from 'src/utils/userInfo.decorator';
-import { update } from 'lodash';
 
 @Controller('reserve')
 export class ReserveController {
@@ -24,7 +22,7 @@ export class ReserveController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch(':id')
+  @Delete(':id')
   async reserveDelete(@UserInfo() user: User, @Param('id') id: string) {
     return this.reserveService.reserveDelete(user, +id);
   }
