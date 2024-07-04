@@ -153,9 +153,29 @@ export class ReserveService {
    });
   }
 
-  // findAll() {
-  //   return `This action returns all reserve`;
-  // }
+  //예매 목록 확인
+  async findReserve(user: User) {
+    
+    const userReserve = await this.reserveRepository.find({
+      relations: ['show'],
+      where: {userId: user.userId},
+      select: {
+        ticketNumber: true,
+        show: {
+          showName : true,
+        },
+        showTime: true,
+        seatInfo: true,
+        price: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      order: {createdAt: 'DESC'}
+    });
+
+    return userReserve;
+  }
 
   // update(id: number, updateReserveDto: UpdateReserveDto) {
   //   return `This action updates a #${id} reserve`;

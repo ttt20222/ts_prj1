@@ -16,10 +16,11 @@ export class ReserveController {
     return this.reserveService.reserveShow(user, createReserveDto);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.reserveService.findAll();
-  // }
+  @UseGuards(AuthGuard('jwt'))
+  @Get()
+  findReserve(@UserInfo() user: User) {
+    return this.reserveService.findReserve(user);
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {
