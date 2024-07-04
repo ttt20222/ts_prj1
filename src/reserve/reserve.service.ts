@@ -1,10 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 
 import { CreateReserveDto } from './dto/create-reserve.dto';
 import { UpdateReserveDto } from './dto/update-reserve.dto';
 import { User } from 'src/user/entities/user.entity';
 import { Reserve } from './entities/reserve.entity'
-import { Repository } from 'typeorm';
+import { EntityManager, QueryFailedError, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Show } from 'src/show/entities/show.entity';
@@ -32,6 +32,7 @@ export class ReserveService {
     @InjectRepository(PointLog)
     private pointLogRepository: Repository<PointLog>,
     private readonly jwtService: JwtService,
+    private entityManager: EntityManager,
   ) {}
 
   //티켓번호 생성
@@ -75,20 +76,6 @@ export class ReserveService {
       where: {showTime: createReserveDto.showTime}
     })
 
-    //예매 가능 여부 확인
-    const checkReserve = await this.showSeatMappingRepository.findOne({
-      where: {
-        showId: show.showId,
-        showTimeId: findShowTimeId.showTimeId,
-        seatId: findSeatId.seatId,
-      },
-    });
-    if(checkReserve.isReserved === true){
-      throw new BadRequestException(
-        '이미 선택된 좌석입니다.'
-      )
-    };
-
     //예매 가능 포인트 확인
     const seatGrade = createReserveDto.seatInfo.split(' ')[0];
 
@@ -103,43 +90,67 @@ export class ReserveService {
       )
     };
 
-    //예매 정보 생성
-    const ticketNumber = await this.getUniqueTicketNumber();
-    const reserveShow = await this.reserveRepository.save({
-      userId: user.userId,
-      ticketNumber: ticketNumber,
-      showId: show.showId,
-      showTime: createReserveDto.showTime,
-      seatInfo: createReserveDto.seatInfo,
-      price: gradePrice.price,
-    })
+    //예매 정보 생성 트랜잭션
+    return await this.entityManager.transaction(async (manager) => {
+      try{
+        //좌석 선택하고 잠금설정
+        const seatMapping = await manager.findOne(showSeatMapping, {
+          where: {
+            showId: show.showId,
+            showTimeId: findShowTimeId.showTimeId,
+            seatId: findSeatId.seatId,
+          },
+          lock: { mode: 'pessimistic_write'},
+        });
 
-    //좌석 예매로 변경
-    await this.showSeatMappingRepository.update(
-      {
-        showId: show.showId,
-        showTimeId: findShowTimeId.showTimeId,
-        seatId: findSeatId.seatId,
-      },
-      {
-        isReserved: true,
+        // 좌석 예매 가능여부 확인
+        if (seatMapping.isReserved === true) {
+          throw new BadRequestException('예매 불가능 좌석입니다.');
+        }
+
+        //좌석 예매로 변경
+        await manager.update(showSeatMapping,
+          {
+            showId: show.showId,
+            showTimeId: findShowTimeId.showTimeId,
+            seatId: findSeatId.seatId,
+          },
+          {
+            isReserved: true,
+          }
+        );
+
+        const ticketNumber = await this.getUniqueTicketNumber();
+        const reserveShow = await manager.save(Reserve, {
+          userId: user.userId,
+          ticketNumber: ticketNumber,
+          showId: show.showId,
+          showTime: createReserveDto.showTime,
+          seatInfo: createReserveDto.seatInfo,
+          price: gradePrice.price,
+        });
+
+        //포인트 차감
+        await manager.save(PointLog, 
+          {
+            userId: user.userId,
+            point: -reserveShow.price,
+          }
+        );
+
+        await manager.update(Point, 
+          {userId: user.userId},
+          {point: userInfo.point - reserveShow.price}
+        );
+
+        return reserveShow;
+
+      } catch(error) {
+        if (error instanceof QueryFailedError) {
+          throw new ConflictException('이미 선택된 좌석입니다.');
+        }
       }
-    );
-
-    //포인트 차감
-    await this.pointLogRepository.create(
-      {
-        userId: user.userId,
-        point: -reserveShow.price,
-      }
-    );
-
-    await this.pointRepository.update(
-      {userId: user.userId},
-      {point: userInfo.point - reserveShow.price}
-    );
-
-    return reserveShow;
+   });
   }
 
   // findAll() {
