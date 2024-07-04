@@ -13,8 +13,8 @@ import { User } from 'src/user/entities/user.entity';
 import { Seat } from './entities/seat.entity';
 import { Image } from './entities/image.entity';
 import { SearchShowDto } from './dto/search-show.dto';
-import { FindSeatDto } from './dto/find-seat.dto';
 import { showSeatMapping } from './entities/showSeatMapping.entity';
+import moment from 'moment';
 
 @Injectable()
 export class ShowService {
@@ -121,11 +121,23 @@ export class ShowService {
 //공연 상세조회
   async findOne(id: number) {
 
-    const findShow = await this.showRepository.findOne({
+    const findShow = await this.showRepository.find({
+      relations: ['showtimeinfo'],
       where: {showId: id},
       select: {
-        createdAt: false,
-        updatedAt: false,
+        showtimeinfo: {
+          showTime: true
+        },
+        showId: true,
+        showName: true,
+        hallName: true,
+        category: true,
+        startDate: true,
+        endDate: true,
+        runtime: true,
+        content: true,
+        seatInfo: true,
+        status: true,
       },
     });
 
@@ -134,6 +146,10 @@ export class ShowService {
         '해당하는 공연이 없습니다.'
       );
     }
+
+    findShow[0].showtimeinfo.forEach((time: any) => {
+      time.showTime = moment(time.showTime).format('YYYY-MM-DD HH:mm');
+    });
 
     return findShow;
   }

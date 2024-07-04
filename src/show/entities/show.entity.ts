@@ -5,7 +5,6 @@ import {
 import { Category } from '../types/showCategory.type';
 import { Status } from '../types/showStatus.type';
 import { Image } from './image.entity';
-import { Hall } from './hall.entity';
 import { showTimeInfo } from './showTimeInfo.entity';
 import { showSeatMapping } from './showSeatMapping.entity';
 import { Reserve } from 'src/reserve/entities/reserve.entity';
