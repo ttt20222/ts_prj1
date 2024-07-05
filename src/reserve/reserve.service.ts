@@ -1,7 +1,6 @@
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 
 import { CreateReserveDto } from './dto/create-reserve.dto';
-import { UpdateReserveDto } from './dto/update-reserve.dto';
 import { User } from 'src/user/entities/user.entity';
 import { Reserve } from './entities/reserve.entity'
 import { EntityManager, QueryFailedError, Repository } from 'typeorm';
@@ -14,6 +13,7 @@ import { showTimeInfo } from 'src/show/entities/showTimeInfo.entity';
 import { Point } from 'src/user/entities/point.entity';
 import { PointLog } from 'src/user/entities/point_log.entity';
 import { Status } from './types/reserve.type';
+import moment from 'moment';
 
 @Injectable()
 export class ReserveService {
@@ -191,6 +191,10 @@ export class ReserveService {
         '예매 내역이 없습니다.'
       );
     };
+
+    userReserve.forEach((show: any) => {
+      show.showTime =  moment(show.showTime).format('YYYY-MM-DD HH:mm');
+    })
 
     return userReserve;
   }
