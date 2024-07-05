@@ -2,7 +2,7 @@ import { compare, hash } from 'bcrypt';
 import _ from 'lodash';
 import { Repository } from 'typeorm';
 
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -73,11 +73,11 @@ export class UserService {
     });
 
     if (_.isNil(user)) {
-      throw new UnauthorizedException('이메일을 확인해주세요.');
+      throw new NotFoundException('이메일을 확인해주세요.');
     }
 
     if (!(await compare(password, user.password))) {
-      throw new UnauthorizedException('비밀번호를 확인해주세요.');
+      throw new BadRequestException('비밀번호를 확인해주세요.');
     }
 
     const payload = { email, sub: user.userId };
@@ -93,6 +93,7 @@ export class UserService {
 
   //내 정보 조회하기
   async getUser(user: User){
+
     const getUser = await this.userRepository.query(
       `select a.email as email, a.name as name, a.nickname as nickname, b.point as point
       from users a join points b

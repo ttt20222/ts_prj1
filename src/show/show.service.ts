@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateShowDto } from './dto/create-show.dto';
 
 import { Repository } from 'typeorm';
@@ -40,7 +40,7 @@ export class ShowService {
   async createShow(user: User, createShowDto: CreateShowDto) {
 
     if(user.isAdmin !== true){
-      throw new UnauthorizedException(
+      throw new ForbiddenException(
         '공연 등록 권한이 없습니다.'
       );
     }

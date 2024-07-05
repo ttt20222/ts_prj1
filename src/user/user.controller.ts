@@ -28,10 +28,4 @@ export class UserController {
   async getUser(@UserInfo() user: User){
     return await this.userService.getUser(user);
   }
-
-  // @UseGuards(AuthGuard('jwt'))
-  // @Get('email')
-  // getEmail(@UserInfo() user: User) {
-  //   return { email: user.email };
-  // }
 }

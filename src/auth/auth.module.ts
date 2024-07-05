@@ -7,6 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 
 import { JwtStrategy } from './jwt.strategy';
 import { ShowModule } from 'src/show/show.module';
+import { ReserveModule } from 'src/reserve/reserve.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { ShowModule } from 'src/show/show.module';
       inject: [ConfigService],
     }),
     UserModule,
-    ShowModule
+    ShowModule,
+    ReserveModule
   ],
   providers: [JwtStrategy],
 })
