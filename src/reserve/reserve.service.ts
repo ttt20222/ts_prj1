@@ -258,7 +258,7 @@ export class ReserveService {
     )
 
     //포인트 환불
-    await manager.save({PointLog, 
+    await manager.save(PointLog, {
       userId: user.userId,
       point: reserve.price,
     });
@@ -272,7 +272,7 @@ export class ReserveService {
       {point: userInfo.point + reserve.price},
     );
 
-    return reserveCancle;
+    return {message: '예매취소 완료'};
     });
   }
 }
