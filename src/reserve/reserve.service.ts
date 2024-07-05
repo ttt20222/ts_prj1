@@ -221,13 +221,14 @@ export class ReserveService {
       )
     };
 
+    return await this.entityManager.transaction("SERIALIZABLE", async (manager) => {
     //좌석 예매불가능 -> 가능으로 변경
     const seatGrade = reserve.seatInfo.split(' ')[0];
     const seatFloor = reserve.seatInfo.split(' ')[1];
     const seatRow = reserve.seatInfo.split(' ')[2];
     const seatNumber = reserve.seatInfo.split(' ')[3];
 
-    const findSeatId = await this.seatRepository.findOne({
+    const findSeatId = await manager.findOne(Seat, {
       where: {showId: reserve.showId,
               seatGrade: seatGrade,
               seatFloor: seatFloor,
@@ -236,13 +237,13 @@ export class ReserveService {
       },
     });
 
-    const findShowTimeId = await this.showTimeInfoRepository.findOne({
+    const findShowTimeId = await manager.findOne(showTimeInfo, {
       where: {showTime: reserve.showTime,
               showId: reserve.showId,
       }
     })
 
-    await this.showSeatMappingRepository.update(
+    await manager.update(showSeatMapping, 
       {showId: reserve.showId,
        showTimeId: findShowTimeId.showTimeId,
        seatId: findSeatId.seatId,
@@ -251,26 +252,27 @@ export class ReserveService {
     );
 
     //예매내역 예매완료 -> 예매취소 변경
-    const reserveCancle = await this.reserveRepository.update(
+    const reserveCancle = await manager.update(Reserve, 
       {reserveId: id},
       {status: Status.예매취소}
     )
 
     //포인트 환불
-    await this.pointLogRepository.save({
+    await manager.save({PointLog, 
       userId: user.userId,
       point: reserve.price,
     });
 
-    const userInfo = await this.pointRepository.findOne({
+    const userInfo = await manager.findOne(Point, {
       where: {userId: user.userId},
     });
 
-    await this.pointRepository.update(
+    await manager.update(Point,
       {userId: user.userId},
       {point: userInfo.point + reserve.price},
     );
 
     return reserveCancle;
+    });
   }
 }
