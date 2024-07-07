@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UserInfo } from 'src/utils/userInfo.decorator';
 
 import { ShowService } from './show.service';
@@ -7,6 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/user/entities/user.entity';
 import { SearchShowDto } from './dto/search-show.dto';
 import { FindShowDto } from './dto/find-show.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('show')
 export class ShowController {
@@ -16,6 +17,13 @@ export class ShowController {
   @Post()
   async createShow(@UserInfo() user: User, @Body() createShowDto: CreateShowDto){
     return await this.showService.createShow(user, createShowDto);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':id')
+  @UseInterceptors(FileInterceptor('file'))
+  async createShowImage(@UserInfo() user: User, @Param('id') id: string, @UploadedFile() file: Express.Multer.File){
+    return await this.showService.createShowImage(user, +id, file);
   }
 
   @Get()

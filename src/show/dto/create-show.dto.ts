@@ -19,10 +19,6 @@ export class CreateShowDto {
   @IsNotEmpty({ message: '공연장소를 입력해주세요.' })
   hallName: string;
 
-  @IsString()
-  @IsNotEmpty({ message: '공연 이미지 url을 입력해주세요.' })
-  imageUrl: string;
-
   @IsEnum(Category, {message: 'Valid options: 뮤지컬 / 콘서트 / 연극'})
   @IsNotEmpty({ message: '공연 카테고리를 입력해주세요.' })
   category: Category;
@@ -37,9 +33,9 @@ export class CreateShowDto {
   @IsNotEmpty({ message: '공연 마지막일을 입력해주세요.' })
   endDate: Date;
 
-  @IsInt()
+  @IsString()
   @IsNotEmpty({ message: '공연 시간을 입력해주세요.' })
-  runtime: number;
+  runtime: string;
 
   @IsString()
   @IsNotEmpty({ message: '공연 설명을 입력해주세요.' })

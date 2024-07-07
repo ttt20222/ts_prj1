@@ -16,6 +16,8 @@ import { SearchShowDto } from './dto/search-show.dto';
 import { showSeatMapping } from './entities/showSeatMapping.entity';
 import moment from 'moment';
 import { FindShowDto } from './dto/find-show.dto';
+import { AwsService } from 'src/aws/aws.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ShowService {
@@ -33,6 +35,7 @@ export class ShowService {
     @InjectRepository(showSeatMapping)
     private showSeatMappingRepository: Repository<showSeatMapping>,
     private readonly jwtService: JwtService,
+    private readonly awsService: AwsService,
   ) {}
 
   //공연 생성
@@ -68,11 +71,6 @@ export class ShowService {
       status : createShowDto.status,
     })
 
-    //이미지 생성
-    await this.imageRepository.save({
-      showId: newShow.showId,
-      imageUrl : createShowDto.imageUrl,
-    })
 
     //좌석 정보 생성
     for (const seat of createShowDto.seatDetailInfo) {
@@ -118,6 +116,44 @@ export class ShowService {
 
     return newShow;
   }
+
+  //공연이미지 등록
+  async createShowImage(user: User, id: number, file: Express.Multer.File) {
+
+    if(user.isAdmin !== true){
+      throw new ForbiddenException(
+        '공연 등록 권한이 없습니다.'
+      );
+    }
+
+    const existShow = await this.showRepository.findOne({
+      where: {showId: id},
+    });
+
+    if(!existShow) {
+      throw new BadRequestException(
+        '공연이 존재하지 않습니다. 공연 먼저 등록해주세요.'
+      )
+    };
+
+    //이미지 s3업로드
+    const imageName = uuidv4();
+    const ext = file.originalname.split('.').pop();
+
+    const imageUrl = await this.awsService.imageUploadToS3(
+      `${imageName}.${ext}`,
+      file,
+      ext,
+    );
+
+    //이미지 생성
+    await this.imageRepository.save({
+      showId: id,
+      imageUrl : imageUrl,
+    })
+
+    return {message: `${existShow.showName} 이미지 등록 성공`}
+  };
 
 //공연 상세조회
   async findOne(id: number) {

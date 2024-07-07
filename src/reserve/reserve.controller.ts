@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ReserveService } from './reserve.service';
 import { CreateReserveDto } from './dto/create-reserve.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/user/entities/user.entity';
 import { UserInfo } from 'src/utils/userInfo.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('reserve')
 export class ReserveController {

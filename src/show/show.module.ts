@@ -12,6 +12,7 @@ import { showSeatMapping } from './entities/showSeatMapping.entity';
 import { ShowService } from './show.service';
 import { ShowController } from './show.controller';
 import { UserModule } from 'src/user/user.module';
+import { AwsModule } from 'src/aws/aws.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserModule } from 'src/user/user.module';
     }),
     TypeOrmModule.forFeature([Show, Image, Hall, Seat, showTimeInfo, showSeatMapping]),
     UserModule,
+    AwsModule,
   ],
   providers: [ShowService],
   controllers: [ShowController],

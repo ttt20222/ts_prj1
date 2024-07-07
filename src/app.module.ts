@@ -19,6 +19,7 @@ import { showTimeInfo } from './show/entities/showTimeInfo.entity';
 import { showSeatMapping } from './show/entities/showSeatMapping.entity';
 import { ReserveModule } from './reserve/reserve.module';
 import { Reserve } from './reserve/entities/reserve.entity';
+import { AwsModule } from './aws/aws.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -55,7 +56,8 @@ const typeOrmModuleOptions = {
     UserModule,
     AuthModule,
     ShowModule,
-    ReserveModule
+    ReserveModule,
+    AwsModule
   ],
   controllers: [],
   providers: [],

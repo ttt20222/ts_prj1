@@ -41,10 +41,8 @@ export class Show {
   endDate: Date;
 
   @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  @Column('int', { name: 'runtime', nullable: false })
-  runtime: number;
+  @Column('varchar', { name: 'runtime', nullable: false })
+  runtime: string;
 
   @IsNotEmpty()
   @Column('text', { name: 'content', nullable: false })
