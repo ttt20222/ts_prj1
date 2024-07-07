@@ -159,11 +159,14 @@ export class ShowService {
   async findOne(id: number) {
 
     const findShow = await this.showRepository.find({
-      relations: ['showtimeinfo'],
+      relations: ['showtimeinfo', 'image'],
       where: {showId: id},
       select: {
         showtimeinfo: {
           showTime: true
+        },
+        image: {
+          imageUrl: true
         },
         showId: true,
         showName: true,
@@ -195,9 +198,10 @@ export class ShowService {
   async searchOne(searchShowDto: SearchShowDto) {
 
     const searchShow = await this.showRepository.query(
-      `select show_name, hall_name, category, start_date , end_date ,runtime , content , seat_info , status
-      from shows
-      where show_name like '%${searchShowDto.showName}%';`
+      `select a.show_name, a.hall_name, a.category, b.image_url, a.start_date , a.end_date , a.runtime , a.content , a.seat_info , a.status
+      from shows a join images b
+      on a.show_id = b.show_id
+      where a.show_name like '%${searchShowDto.showName}%';`
     );
 
     if(searchShow.length === 0) {
@@ -249,6 +253,7 @@ export class ShowService {
   async findAll(findShowDto: FindShowDto) {
     if(findShowDto) {
       const shows = await this.showRepository.find({
+        relations: ['image'],
         where: {category: findShowDto.category},
       });
 
@@ -256,6 +261,7 @@ export class ShowService {
 
     }else{
       const allShows = await this.showRepository.find({
+        relations: ['image'],
         order: {createdAt: 'DESC'}
       });
 
