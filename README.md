@@ -1,3 +1,36 @@
+# 온라인 공연 예매 사이트
+
+## 프로젝트 소개
+
+`TypeScript`와 `Nest.js`, `TypeORM`을 사용하여, 온라인 공연 예매 서비스를 만들어봅니다.
+
+## API
+
+[API명세서 링크](https://admitted-dream-193.notion.site/07a3d6b3ea80448186f7979a100e856b?pvs=44)
+
+## ERD
+
+[ERD 링크](https://drawsql.app/teams/les-team-1/diagrams/enterpark-ts-prj)
+
+
+## commit 규칙
+
+| 작업 타입   | 작업내용                       |
+| ----------- | ------------------------------ |
+| update	| 새로운 기능 추가
+| add	|없던 파일 생성, 초기 세팅
+| fix	|코드 수정
+| bugfix	|버그 수정
+| docs	|문서 수정
+| style	|코드 스타일 변경
+| design	|사용자 UI 디자인 변경 (CSS 등)
+|test	|테스트 코드, 리팩토링 테스트 코드 추가
+|refactor	|코드 리팩토링
+|rename	|파일 혹은 폴더명을 수정만 한 경우
+|remove	|폴더/ 파일 이동
+|del	|기능/파일을 삭제
+
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
@@ -71,24 +104,3 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
-
-### commit 규칙
-
-| 작업 타입   | 작업내용                       |
-| ----------- | ------------------------------ |
-| update	| 새로운 기능 추가
-| add	|없던 파일 생성, 초기 세팅
-| fix	|코드 수정
-| bugfix	|버그 수정
-| docs	|문서 수정
-| style	|코드 스타일 변경
-| design	|사용자 UI 디자인 변경 (CSS 등)
-|test	|테스트 코드, 리팩토링 테스트 코드 추가
-|refactor	|코드 리팩토링
-|build	|빌드 파일 수정
-|ci	|CI 설정 파일 수정
-|perf	|성능 개선
-|chore	|빌드 업무 수정, 패키지 매니저 수정 (gitignore 수정 등)
-|rename	|파일 혹은 폴더명을 수정만 한 경우
-|remove	|폴더/ 파일 이동
-|del	|기능/파일을 삭제
