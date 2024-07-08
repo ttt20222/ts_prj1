@@ -10,7 +10,7 @@
 
 ## ERD
 
-[ERD 링크](https://drawsql.app/teams/les-team-1/diagrams/enterpark-ts-prj)
+[ERD 링크](https://drawsql.app/teams/les-team-1/diagrams/ts-prj1)
 
 
 ## commit 규칙
